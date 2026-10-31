@@ -81,6 +81,9 @@ public class User
     public NetWallpaperJukebox[] WallpaperJukeboxList { get; set; } = [];
     public List<int> LobbyDecoBackgroundList { get; set; } = [];
     public List<int> SdLobbyList { get; set; } = [];
+
+    // Costume (box) gacha: event id -> reward orders already drawn from the box
+    public Dictionary<int, List<int>> EventBoxGachaOrders { get; set; } = [];
     public List<int> LiveWallpaperList { get; set; } = [];
 
     //角色时装

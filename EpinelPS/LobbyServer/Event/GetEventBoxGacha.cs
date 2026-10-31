@@ -9,10 +9,12 @@ public class GetEventBoxGacha : LobbyMessage
         ReqGetEventBoxGacha req = await ReadData<ReqGetEventBoxGacha>();
         User user = GetUser();
 
-        ResGetEventBoxGacha response = new()
+        ResGetEventBoxGacha response = new();
+        if (user.EventBoxGachaOrders.TryGetValue(req.EventId, out List<int>? orders))
         {
-
-        };
+            response.RewardOrders.AddRange(orders);
+            response.GachaCount = orders.Count;
+        }
 
         await WriteDataAsync(response);
     }
