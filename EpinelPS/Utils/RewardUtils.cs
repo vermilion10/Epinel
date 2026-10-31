@@ -41,7 +41,7 @@ public class RewardUtils
 
     /// <summary>
     /// Adds commander exp. ExperiencePoint is the total exp, matching the cumulative values in UserExpTable,
-    /// where a level's Exp is the total needed to reach the next level.
+    /// where a level's Exp is the total at which that level starts (the client draws the bar the same way).
     /// </summary>
     public static NetIncreaseExpData AddUserExp(User user, int exp)
     {
@@ -50,7 +50,7 @@ public class RewardUtils
         int newXp = beforeExp + exp;
         int newLevel = beforeLevel;
 
-        int nextLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
+        int nextLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel + 1);
         while (nextLevelExp > 0 && newXp >= nextLevelExp)
         {
             newLevel++;
@@ -60,7 +60,7 @@ public class RewardUtils
             else
                 user.Currency.Add(CurrencyType.FreeCash, 30);
 
-            nextLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
+            nextLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel + 1);
         }
 
         user.userPointData.ExperiencePoint = newXp;
