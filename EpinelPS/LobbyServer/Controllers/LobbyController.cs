@@ -132,6 +132,7 @@ public class LobbyController(IUserService UserService, GameContext db) : Control
         response.TimeRewardBuffs.AddRange(NetUtils.GetOutpostTimeReward(user));
 
         response.OwnedLobbyDecoBackgroundIdList.AddRange(user.LobbyDecoBackgroundList);
+        response.OwnedSdLobbyIdList.AddRange(user.SdLobbyList);
 
         response.ClearLessons.AddRange(user.CompletedTacticAcademyLessons);
 

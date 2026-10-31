@@ -45,6 +45,10 @@ public static class EventShopHelper
 
         if (MultipleResponse.Product.AutoCharge.Count > 0) response.Product.AutoCharge.AddRange(MultipleResponse.Product.AutoCharge);
 
+        response.Product.LiveWallPapers.AddRange(MultipleResponse.Product.LiveWallPapers);
+        response.Product.UserTitleList.AddRange(MultipleResponse.Product.UserTitleList);
+        response.Product.SdLobbyIdList.AddRange(MultipleResponse.Product.SdLobbyIdList);
+
         // user.AddTrigger(Trigger.MainShopBuy, req.Quantity);
 
         // Save changes to the database
@@ -128,11 +132,18 @@ public static class EventShopHelper
             }
             else if (shopProduct.GoodsType == RewardType.UserTitle)
             {
+                user.AddUnique(user.TitleList, shopProduct.GoodsId);
                 response.Product.UserTitleList.Add(shopProduct.GoodsId);
             }
             else if (shopProduct.GoodsType == RewardType.LiveWallpaper)
             {
+                user.AddUnique(user.LiveWallpaperList, shopProduct.GoodsId);
                 response.Product.LiveWallPapers.Add(shopProduct.GoodsId);
+            }
+            else if (shopProduct.GoodsType == RewardType.SDLobby)
+            {
+                user.AddUnique(user.SdLobbyList, shopProduct.GoodsId);
+                response.Product.SdLobbyIdList.Add(shopProduct.GoodsId);
             }
             else
             {

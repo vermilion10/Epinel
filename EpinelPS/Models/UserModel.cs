@@ -80,6 +80,7 @@ public class User
     public NetWallpaperPlaylist[] WallpaperPlaylistList { get; set; } = [];
     public NetWallpaperJukebox[] WallpaperJukeboxList { get; set; } = [];
     public List<int> LobbyDecoBackgroundList { get; set; } = [];
+    public List<int> SdLobbyList { get; set; } = [];
     public List<int> LiveWallpaperList { get; set; } = [];
 
     //角色时装

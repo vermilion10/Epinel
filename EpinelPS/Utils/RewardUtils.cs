@@ -575,7 +575,7 @@ public class RewardUtils
             if (record != null)
             {
                 ret.UserTitleList.Add(record.Id);
-                user.TitleList.Add(record.Id);
+                user.AddUnique(user.TitleList, record.Id);
             }
         }
         else if (rewardType == RewardType.Frame)
@@ -634,6 +634,16 @@ public class RewardUtils
                 user.AddUnique(user.LiveWallpaperList, record.Id);
             }
 
+        }
+        else if (rewardType == RewardType.SDLobby)
+        {
+            ret.SdLobbyIdList.Add(rewardId);
+            user.AddUnique(user.SdLobbyList, rewardId);
+        }
+        else if (rewardType == RewardType.LobbyDecoBackground)
+        {
+            ret.LobbyDecoBackgroundList.Add(rewardId);
+            user.AddUnique(user.LobbyDecoBackgroundList, rewardId);
         }
         else if (rewardType == RewardType.ProfileCardObject)
         {
