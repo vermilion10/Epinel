@@ -47,6 +47,8 @@ public class User
     public int BanId { get; set; } = 0;
     public DateTime LastReset { get; set; } = DateTime.MinValue;
     public DateTime LastWeeklyReset { get; set; } = DateTime.MinValue;
+    // Set after stored triggers are rewritten, so the client drops its cached copy on the next sync
+    public bool TriggerResyncPending { get; set; }
 
     // Game data
     public List<string> CompletedScenarios { get; set; } = [];
@@ -242,7 +244,7 @@ public class User
         {
             Type = type,
             ConditionId = conditionId,
-            CreatedAt = DateTime.UtcNow.AddHours(9).Ticks,
+            CreatedAt = DateTime.UtcNow.Ticks,
             Value = value
         };
 

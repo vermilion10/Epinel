@@ -38,6 +38,17 @@ public class TriggerSync : LobbyMessage
             response.Restart = true;
             effectiveSeq = 0;
         }
+        else if (user.TriggerResyncPending && effectiveSeq > 0)
+        {
+            Logging.WriteLine($"[TriggerSync] Stored triggers changed for user {user.ID}; requesting restart from 0", LogType.Info);
+            response.Restart = true;
+            effectiveSeq = 0;
+        }
+        if (user.TriggerResyncPending)
+        {
+            user.TriggerResyncPending = false;
+            JsonDb.Save();
+        }
 
         // Look for triggers past that amount in ascending ID order
         TriggerModelNew[] newTriggers = [.. GameContext.Triggers
