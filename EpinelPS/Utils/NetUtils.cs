@@ -281,6 +281,14 @@ public class NetUtils
         long rewardValue = GetOutpostRewardAmount(user, type, duration.TotalMinutes, true, ratio);
         long finalValue;
 
+        // Commander exp is a level, not a currency
+        if (type == CurrencyType.UserExp)
+        {
+            if (addToUser)
+                reward.UserExp = RewardUtils.AddUserExp(user, (int)rewardValue);
+            return;
+        }
+
         if (addToUser)
         {
             user.AddCurrency(type, rewardValue);

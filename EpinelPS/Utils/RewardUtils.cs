@@ -84,6 +84,44 @@ public class RewardUtils
     }
 
 
+    /// <summary>
+    /// Adds commander exp. ExperiencePoint is the exp within the current level, and a level's
+    /// UserExpTable value is the exp needed to reach the next one.
+    /// </summary>
+    public static NetIncreaseExpData AddUserExp(User user, int exp)
+    {
+        int beforeExp = user.userPointData.ExperiencePoint;
+        int beforeLevel = user.userPointData.UserLevel;
+        int newXp = beforeExp + exp;
+        int newLevel = beforeLevel;
+
+        int newLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
+        while (newLevelExp > 0 && newXp >= newLevelExp)
+        {
+            newLevel++;
+            newXp -= newLevelExp;
+            user.AddTrigger(Trigger.UserLevel, newLevel, 0);
+            if (user.Currency.ContainsKey(CurrencyType.FreeCash))
+                user.Currency[CurrencyType.FreeCash] += 30;
+            else
+                user.Currency.Add(CurrencyType.FreeCash, 30);
+
+            newLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
+        }
+
+        user.userPointData.ExperiencePoint = newXp;
+        user.userPointData.UserLevel = newLevel;
+
+        return new NetIncreaseExpData()
+        {
+            BeforeExp = beforeExp,
+            BeforeLv = beforeLevel,
+            CurrentExp = newXp,
+            CurrentLv = newLevel,
+            GainExp = exp,
+        };
+    }
+
     public static NetRewardData RegisterRewardsForUserDou(User user, List<int> rewardIds)
     {
         NetRewardData ret = new()
