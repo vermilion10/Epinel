@@ -19,9 +19,11 @@ public class GetUserProfile : LobbyMessage
                 User = LobbyHandler.CreateWholeUserDataFromDbUser(user),
                 LastActionAt = DateTimeOffset.UtcNow.Ticks,
             };
+            // Hidden characters (April Fools, NPC units) are not counted as owned Nikkes
             foreach (var corp in user.Characters
-                .Select(c => GameData.Instance.CharacterTable.TryGetValue(c.Tid, out CharacterRecord? r) ? (int)r.Corporation : 0)
-                .GroupBy(x => x))
+                .Select(c => GameData.Instance.CharacterTable.GetValueOrDefault(c.Tid))
+                .Where(r => r != null && r.IsVisible)
+                .GroupBy(r => (int)r!.Corporation))
             {
                 response.Data.CharacterCount.Add(new NetCharacterCount() { CorporationType = corp.Key, Count = corp.Count() });
             }
