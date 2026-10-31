@@ -17,6 +17,7 @@ public class GetUserProfile : LobbyMessage
             response.Data = new NetProfileData
             {
                 User = LobbyHandler.CreateWholeUserDataFromDbUser(user),
+                Exp = user.userPointData.ExperiencePoint,
                 LastActionAt = DateTimeOffset.UtcNow.Ticks,
             };
             // Hidden characters (April Fools, NPC units) are not counted as owned Nikkes
