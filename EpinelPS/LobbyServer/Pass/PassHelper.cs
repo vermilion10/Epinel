@@ -112,48 +112,7 @@ public static class PassHelper
             }
 
             if (rewardData.UserExp != 0)
-            {
-                int newXp = rewardData.UserExp + user.userPointData.ExperiencePoint;
-
-                int newLevelExp = GameData.Instance.GetUserMinXpForLevel(user.userPointData.UserLevel);
-                int newLevel = user.userPointData.UserLevel;
-
-                if (newLevelExp == -1)
-                {
-                    log.Warn("Unknown user level value for xp " + newXp);
-                }
-
-                int newGems = 0;
-
-                while (newXp >= newLevelExp)
-                {
-                    newLevel++;
-                    newGems += 30;
-                    newXp -= newLevelExp;
-                    if (user.Currency.ContainsKey(CurrencyType.FreeCash))
-                        user.Currency[CurrencyType.FreeCash] += 30;
-                    else
-                        user.Currency.Add(CurrencyType.FreeCash, 30);
-
-                    newLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
-                }
-
-                // TODO: what is the difference between IncreaseExp and GainExp
-                // NOTE: Current Exp/Lv refers to after XP was added.
-
-                reward.UserExp = new NetIncreaseExpData()
-                {
-                    BeforeExp = user.userPointData.ExperiencePoint,
-                    BeforeLv = user.userPointData.UserLevel,
-
-                    // IncreaseExp = rewardData.UserExp,
-                    CurrentExp = newXp,
-                    CurrentLv = newLevel,
-                    GainExp = rewardData.UserExp,
-                };
-                user.userPointData.ExperiencePoint = newXp;
-                user.userPointData.UserLevel = newLevel;
-            }
+                reward.UserExp = RewardUtils.AddUserExp(user, rewardData.UserExp);
 
             foreach (var item in rewardData.Rewards)
             {
