@@ -26,6 +26,14 @@ public class GetUserProfile : LobbyMessage
                 response.Data.CharacterCount.Add(new NetCharacterCount() { CorporationType = corp.Key, Count = corp.Count() });
             }
             response.Data.Language = "en";
+            if (user.TowerProgress.TryGetValue(CorporationTowerType.ALL, out int towerFloor))
+                response.Data.LastTribeTowerFloor = towerFloor;
+            var overclock = user.ResetableData.SimRoomData.CurrentSeasonData.CurrentSeasonHighScore;
+            if (overclock.OptionLevel > 0)
+            {
+                response.Data.SimRoomOverclockHighScoreLevel = overclock.OptionLevel;
+                response.Data.SimRoomOverclockHighScoreData.Add(new NetProfileSimRoomOverclockHighScoreData() { Season = overclock.Season, OptionLevel = overclock.OptionLevel, OptionList = { overclock.OptionList } });
+            }
             response.Data.ProfileFrameHistoryType = user.ProfileFrameHistoryType;
             response.Data.RecentAcquireFilterTypes.AddRange(user.RecentAcquireFilterTypes);
             foreach (ProfileRepresentativeFrameData frame in user.RepresentativeProfileFrames)
