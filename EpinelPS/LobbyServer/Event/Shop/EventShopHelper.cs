@@ -212,6 +212,10 @@ public static class EventShopHelper
 
         if (GameData.Instance.eventManagers.TryGetValue(eventId, out var eventRecord))
         {
+            if (int.TryParse(eventRecord.EventShortcutId, out int shortcutShopId) && GameData.Instance.ContentsShopTable.ContainsKey(shortcutShopId))
+            {
+                return shortcutShopId;
+            }
             if (eventRecord.Id is not 0)
             {
                 return Convert.ToInt32(eventRecord.Id);
@@ -235,8 +239,8 @@ public static class EventShopHelper
 
         try
         {
-            var tableShop = GameData.Instance.ContentsShopTable.Values
-            .First(x => (x.BundleId % 1000) == (shopId % 1000));
+            if (!GameData.Instance.ContentsShopTable.TryGetValue(shopId, out ContentsShopRecord? tableShop))
+                tableShop = GameData.Instance.ContentsShopTable.Values.First(x => (x.BundleId % 1000) == (shopId % 1000));
             if (tableShop == null && tableShop.Id == 0)
             {
                 Logging.WriteLine($"Invalid shopId: {shopId}", LogType.Warning);
