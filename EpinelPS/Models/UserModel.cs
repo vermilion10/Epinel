@@ -4,6 +4,12 @@ using EpinelPS.Utils;
 
 namespace EpinelPS.Models;
 
+public class ProfileRepresentativeFrameData
+{
+    public int Slot { get; set; }
+    public int FrameTableId { get; set; }
+}
+
 public class ClearedTutorialData
 {
     public int Id { get; set; }
@@ -219,6 +225,11 @@ public class User
     // Profile Cards
     public List<int> ProfileCardsData { get; set; } = [];
     public ProfileCardDecorationLayout ProfileCardDecoration { get; set; } = new();
+
+    // Profile frames shown on the profile card
+    public NetProfileFrameHistoryType ProfileFrameHistoryType { get; set; }
+    public List<ProfileRepresentativeFrameData> RepresentativeProfileFrames { get; set; } = [];
+    public List<int> RecentAcquireFilterTypes { get; set; } = [];
     
     public TriggerModelNew AddTrigger(Trigger type, int value, int conditionId = 0, bool logToConsole = true)
     {

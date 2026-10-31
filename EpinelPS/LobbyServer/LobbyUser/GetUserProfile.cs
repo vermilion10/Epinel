@@ -1,4 +1,4 @@
-﻿using EpinelPS.Data;
+using EpinelPS.Data;
 
 namespace EpinelPS.LobbyServer.LobbyUser;
 
@@ -19,7 +19,24 @@ public class GetUserProfile : LobbyMessage
                 User = LobbyHandler.CreateWholeUserDataFromDbUser(user),
                 LastActionAt = DateTimeOffset.UtcNow.Ticks,
             };
-            response.Data.CharacterCount.Add(new NetCharacterCount() { Count = user.Characters.Count });
+            foreach (var corp in user.Characters
+                .Select(c => GameData.Instance.CharacterTable.TryGetValue(c.Tid, out CharacterRecord? r) ? (int)r.Corporation : 0)
+                .GroupBy(x => x))
+            {
+                response.Data.CharacterCount.Add(new NetCharacterCount() { CorporationType = corp.Key, Count = corp.Count() });
+            }
+            response.Data.Language = "en";
+            response.Data.ProfileFrameHistoryType = user.ProfileFrameHistoryType;
+            response.Data.RecentAcquireFilterTypes.AddRange(user.RecentAcquireFilterTypes);
+            foreach (ProfileRepresentativeFrameData frame in user.RepresentativeProfileFrames)
+            {
+                response.Data.RepresentativeProfileFrames.Add(new NetProfileRepresentativeFrame() { Slot = frame.Slot, FrameTableId = frame.FrameTableId });
+            }
+            // every frame is treated as owned (see GetProfileFrame)
+            foreach (UserFrameRecord frameRecord in GameData.Instance.userFrameTable.Values)
+            {
+                response.Data.ProfileFrames.Add(new NetProfileFrameData() { FrameTid = frameRecord.Id, AcquiredAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow) });
+            }
             response.Data.CostumeCount = user.CostumeList.Count;
             response.Data.InfraCoreLv = user.InfraCoreLvl;
             response.Data.LastCampaignNormalStageId = user.LastNormalStageCleared;
