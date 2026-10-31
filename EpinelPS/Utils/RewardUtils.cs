@@ -20,7 +20,52 @@ public class RewardUtils
         if (rewardData.Rewards == null) return ret;
 
         if (rewardData.UserExp != 0)
-            ret.UserExp = AddUserExp(user, rewardData.UserExp);
+        {
+            int newXp = rewardData.UserExp + user.userPointData.ExperiencePoint;
+
+            int newLevelExp = GameData.Instance.GetUserMinXpForLevel(user.userPointData.UserLevel);
+            int newLevel = user.userPointData.UserLevel;
+
+            if (newLevelExp == -1)
+            {
+                Console.WriteLine("Unknown user level value for xp " + newXp);
+            }
+
+            int newGems = 0;
+
+            while (newXp >= newLevelExp)
+            {
+                newLevel++;
+                newGems += 30;
+                newXp -= newLevelExp;
+                if (user.Currency.ContainsKey(CurrencyType.FreeCash))
+                    user.Currency[CurrencyType.FreeCash] += 30;
+                else
+                    user.Currency.Add(CurrencyType.FreeCash, 30);
+
+                newLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
+            }
+
+
+            // TODO: what is the difference between IncreaseExp and GainExp
+            // NOTE: Current Exp/Lv refers to after XP was added.
+
+            ret.UserExp = new NetIncreaseExpData()
+            {
+                BeforeExp = user.userPointData.ExperiencePoint,
+                BeforeLv = user.userPointData.UserLevel,
+
+                // IncreaseExp = rewardData.UserExp,
+                CurrentExp = newXp,
+                CurrentLv = newLevel,
+
+                GainExp = rewardData.UserExp,
+
+            };
+            user.userPointData.ExperiencePoint = newXp;
+
+            user.userPointData.UserLevel = newLevel;
+        }
 
         foreach (var item in rewardData.Rewards)
         {
@@ -39,43 +84,6 @@ public class RewardUtils
     }
 
 
-    /// <summary>
-    /// Adds commander exp. ExperiencePoint is the total exp, matching the cumulative values in UserExpTable,
-    /// where a level's Exp is the total needed to reach the next level.
-    /// </summary>
-    public static NetIncreaseExpData AddUserExp(User user, int exp)
-    {
-        int beforeExp = user.userPointData.ExperiencePoint;
-        int beforeLevel = user.userPointData.UserLevel;
-        int newXp = beforeExp + exp;
-        int newLevel = beforeLevel;
-
-        int nextLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
-        while (nextLevelExp > 0 && newXp >= nextLevelExp)
-        {
-            newLevel++;
-            user.AddTrigger(Trigger.UserLevel, newLevel, 0);
-            if (user.Currency.ContainsKey(CurrencyType.FreeCash))
-                user.Currency[CurrencyType.FreeCash] += 30;
-            else
-                user.Currency.Add(CurrencyType.FreeCash, 30);
-
-            nextLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
-        }
-
-        user.userPointData.ExperiencePoint = newXp;
-        user.userPointData.UserLevel = newLevel;
-
-        return new NetIncreaseExpData()
-        {
-            BeforeExp = beforeExp,
-            BeforeLv = beforeLevel,
-            CurrentExp = newXp,
-            CurrentLv = newLevel,
-            GainExp = exp,
-        };
-    }
-
     public static NetRewardData RegisterRewardsForUserDou(User user, List<int> rewardIds)
     {
         NetRewardData ret = new()
@@ -92,7 +100,51 @@ public class RewardUtils
                 if (rewardData.Rewards != null)
                 {
                     if (rewardData.UserExp != 0)
-                        ret.UserExp = AddUserExp(user, rewardData.UserExp);
+                    {
+                        int newXp = rewardData.UserExp + user.userPointData.ExperiencePoint;
+                        int newLevelExp = GameData.Instance.GetUserMinXpForLevel(user.userPointData.UserLevel);
+                        int newLevel = user.userPointData.UserLevel;
+                        if (newLevelExp == -1)
+                        {
+                            Console.WriteLine("Unknown user level value for xp " + newXp);
+                        }
+
+                        int newGems = 0;
+
+                        while (newXp >= newLevelExp)
+                        {
+                            newLevel++;
+                            user.AddTrigger(Trigger.UserLevel, newLevel, 0);
+                            newGems += 30;
+                            newXp -= newLevelExp;
+                            if (user.Currency.ContainsKey(CurrencyType.FreeCash))
+                                user.Currency[CurrencyType.FreeCash] += 30;
+                            else
+                                user.Currency.Add(CurrencyType.FreeCash, 30);
+
+                            newLevelExp = GameData.Instance.GetUserMinXpForLevel(newLevel);
+                        }
+
+
+                        // TODO: what is the difference between IncreaseExp and GainExp
+                        // NOTE: Current Exp/Lv refers to after XP was added.
+
+                        ret.UserExp = new NetIncreaseExpData()
+                        {
+                            BeforeExp = user.userPointData.ExperiencePoint,
+                            BeforeLv = user.userPointData.UserLevel,
+
+                            // IncreaseExp = rewardData.UserExp,
+                            CurrentExp = newXp,
+                            CurrentLv = newLevel,
+
+                            GainExp = rewardData.UserExp,
+
+                        };
+                        user.userPointData.ExperiencePoint = newXp;
+
+                        user.userPointData.UserLevel = newLevel;
+                    }
 
                     foreach (var item in rewardData.Rewards)
                     {
